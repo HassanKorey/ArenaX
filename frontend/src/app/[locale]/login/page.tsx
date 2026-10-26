@@ -91,6 +91,10 @@ export default function LoginPage() {
       password: result.data.password,
       rememberMe: result.data.rememberMe,
     });
+
+    const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+    const redirect = params.get("redirect") ?? "/";
+    router.replace(redirect);
   };
 
   return (

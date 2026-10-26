@@ -126,18 +126,26 @@ function getStoredToken(): string | null {
 
 function getStoredRefreshToken(): string | null {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem("refresh_token") ?? sessionStorage.getItem("refresh_token");
+  return (
+    localStorage.getItem("refresh_token") ??
+    sessionStorage.getItem("refresh_token") ??
+    localStorage.getItem("auth_refresh_token") ??
+    sessionStorage.getItem("auth_refresh_token")
+  );
 }
 
 function storeTokens(access: string, refresh?: string): void {
   if (typeof window === "undefined") return;
   localStorage.setItem("auth_token", access);
-  if (refresh) localStorage.setItem("refresh_token", refresh);
+  if (refresh) {
+    localStorage.setItem("refresh_token", refresh);
+    localStorage.setItem("auth_refresh_token", refresh);
+  }
 }
 
 function clearTokens(): void {
   if (typeof window === "undefined") return;
-  ["auth_token", "refresh_token"].forEach((k) => {
+  ["auth_token", "refresh_token", "auth_refresh_token"].forEach((k) => {
     localStorage.removeItem(k);
     sessionStorage.removeItem(k);
   });
@@ -216,12 +224,30 @@ export class EnhancedApiClient {
           clearTokens();
           return null;
         }
-        const json = await res.json() as { accessToken?: string; tokens?: { accessToken: string; refreshToken?: string } };
+        const json = (await res.json()) as {
+          accessToken?: string;
+          access_token?: string;
+          refreshToken?: string;
+          refresh_token?: string;
+          tokens?: {
+            accessToken?: string;
+            access_token?: string;
+            refreshToken?: string;
+            refresh_token?: string;
+          };
+        };
         const accessToken =
           json?.accessToken ??
+          json?.access_token ??
           json?.tokens?.accessToken ??
+          json?.tokens?.access_token ??
           null;
-        if (accessToken) storeTokens(accessToken, json?.tokens?.refreshToken);
+        const newRefreshToken =
+          json?.refreshToken ??
+          json?.refresh_token ??
+          json?.tokens?.refreshToken ??
+          json?.tokens?.refresh_token;
+        if (accessToken) storeTokens(accessToken, newRefreshToken);
         return accessToken;
       } catch {
         return null;

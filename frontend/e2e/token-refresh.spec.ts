@@ -27,6 +27,7 @@ async function seedExpiredSession(page: Page) {
     ({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) => {
       localStorage.setItem("auth_token", accessToken);
       localStorage.setItem("auth_refresh_token", refreshToken);
+      localStorage.setItem("refresh_token", refreshToken);
       localStorage.setItem("arenax_remember_me", "true");
       localStorage.setItem(
         "arenax_auth_user",
@@ -169,7 +170,7 @@ test.describe("Silent token refresh", () => {
 
     // Toast should appear
     await expect(
-      page.locator('[role="alert"]').filter({ hasText: /session.*expired/i }),
+      page.locator('[role="alert"]').filter({ hasText: /session.*expired/i }).first(),
     ).toBeVisible({ timeout: 6_000 });
   });
 

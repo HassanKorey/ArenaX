@@ -63,7 +63,7 @@ export function TournamentCardWithQuickJoin({
   const [showQuickJoin, setShowQuickJoin] = useState(false);
   const { schedule, cancelScheduled } = useTournamentPrefetch();
 
-  const status = statusConfig[tournament.status];
+  const status = statusConfig[tournament.status] ?? statusConfig.registration_open;
   const participantPercentage = Math.round(
     (tournament.currentParticipants / tournament.maxParticipants) * 100,
   );
@@ -97,7 +97,7 @@ export function TournamentCardWithQuickJoin({
         onBlur={cancelScheduled}
         onTouchStart={() => schedule(tournament.id)}
       >
-      <Card className="flex flex-col overflow-hidden transition-shadow hover:shadow-lg">
+      <Card data-testid="tournament-card" className="tournament-card flex flex-col overflow-hidden transition-shadow hover:shadow-lg">
         <div className="relative h-36 w-full shrink-0 bg-muted">
           <Image
             src={getTournamentBannerUrl(tournament.id)}

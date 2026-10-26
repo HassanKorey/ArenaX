@@ -11,10 +11,20 @@ const LOCALE = "en";
 async function seedAuth(page: Parameters<typeof mockAuthHandlers>[0]) {
   await page.evaluate(() => {
     localStorage.setItem("auth_token", "mock-access-token");
-    localStorage.setItem(
-      "auth_user",
-      JSON.stringify({ id: "user-1", username: "testuser", email: "test@example.com" })
-    );
+    localStorage.setItem("refresh_token", "mock-refresh-token");
+    const userPayload = JSON.stringify({
+      id: "user-1",
+      username: "testuser",
+      email: "test@example.com",
+      isVerified: true,
+      elo: 1200,
+      createdAt: new Date().toISOString(),
+      token: "",
+      refreshToken: "",
+    });
+    localStorage.setItem("auth_user", userPayload);
+    localStorage.setItem("arenax_auth_user", userPayload);
+    sessionStorage.setItem("arenax_auth_user", userPayload);
   });
 }
 

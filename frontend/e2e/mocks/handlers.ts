@@ -19,12 +19,14 @@ export const mockTournament = {
   id: "tournament-1",
   name: "Weekend Warriors Cup",
   game: "FIFA 24",
-  status: "upcoming",
+  gameType: "FIFA 24",
+  status: "registration_open",
   entryFee: 500,
   prizePool: 10000,
   maxParticipants: 32,
   currentParticipants: 12,
   startDate: new Date(Date.now() + 86400000).toISOString(),
+  startTime: new Date(Date.now() + 86400000).toISOString(),
 };
 
 export const mockMatch = {
@@ -65,6 +67,31 @@ export async function mockAuthHandlers(page: Page) {
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({ message: "Verification email sent" }),
+    })
+  );
+
+  await page.route(`${BASE}/users/me`, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        id: mockUser.id,
+        username: mockUser.username,
+        email: mockUser.email,
+        is_verified: true,
+        created_at: new Date().toISOString(),
+        elo: 1200,
+      }),
+    })
+  );
+
+  await page.route(`${BASE}/auth/me`, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        user: mockUser,
+      }),
     })
   );
 }
